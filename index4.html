@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PFsite page4(manage)</title>
+    
+    <link href="./CSS/reset.css" rel="stylesheet">
+	<link href="./css/stayle.css" rel="stylesheet">	
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+</head>
+
+<body>
+        <header>
+        <div class="wrap">
+			<h1>
+				<a href="このファイルをダブルクリック.html">
+					<img src="./images/mainlogo.png" alt="PORTFOLIO">
+				</a>
+			</h1>
+			<nav>
+				<ul class="menu">
+					<li>
+					<a href="このファイルをダブルクリック.html">ABOUT</a>
+					</li>
+					<li>
+					<a href="このファイルをダブルクリック.html#s2">GALLELY</a>
+                        <ul class="sub">
+                            <li class="2D"><a href="index2.html">2D</a></li>
+                            <li class="3D"><a href="index3.html">3D</a></li>
+                            <li class="MANAGEMENT"><a href="index4.html">MANAGEMENT</a></li>
+                        </ul>
+					</li>
+					<li>
+					<a href="このファイルをダブルクリック.html#s3">CONTACT</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+    </header>
+    
+    <div class="sections" aria-hidden="false">
+    <div id="tMG" class="track">
+      <section class="section s1" data-index="0">
+          <div class="work">
+            <div class="wrap">
+                <div class="left">
+                    <img src="images/TRcupGP.png" alt="ロゴマーク">
+                </div>
+                <div class="right">
+                        <p class="No">MG01</p>
+                        <p class="smalltitle">ショップデザイン<br>「TR cup GP」</p>
+                        <p class="read">誰もがやりたかったことが出来るショップ<br>誰もが怒られるから我慢している台車での全力レースを出来るお店をデザインしました。<br>エンタメ施設らしく見ただけで楽しいデザインを意識しました。
+                        </p>
+                </div>
+            </div>
+        </div>
+      </section>
+      <section class="section s2" data-index="1">
+              <div class="work">
+                <div class="wrap">
+                    <div class="left">
+                        <img src="images/powerpuff site.png" alt="CPsite">
+                    </div>
+                    <div class="right">
+                            <p class="No">MG02</p>
+                            <p class="smalltitle">パワーパフガールズ×<br>モンスターエナジーイベント企画</p>
+                            <p class="read">バズる企画を考える<br>エナジードリンク『モンスターエナジー』のSNS活用企画案をグループで考えました。<br>パワーパフガールズの力を借りモンスターの認知度がさらに上がる企画になる様に仕上げました。
+                            </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+      <section class="section s3" data-index="2">
+          <div class="work">
+                <div class="wrap">
+                    <div class="left">
+                        <img src="images/powerpuff cans.png" alt="CP">
+                    </div>
+                    <div class="right">
+                            <p class="No">MG02`</p>
+                            <p class="smalltitle">課題：売上増加のためにバズらせたい<br>解決：飲めば飲むほど応援になる企画</p>
+                            <p class="read">ターゲット<br>10代〜30代男女　モンスターエナジーを飲んだことがない人々<br>コンセプト<br>・キャラクターの魅力が伝わる<br>
+                                ・モンスターの持つ雰囲気を生かす<br>
+                                ・バズる要素を分析する<br>
+                            </p>
+                    </div>
+                </div>
+            </div>
+      </section>　
+    </div>
+  </div>
+
+  <!-- ページネーション -->
+  <div class="pager" aria-hidden="false"></div>
+
+  <div class="hint">スクロール / スワイプ / ↑ ↓ / ドットで移動</div>
+
+  <script>
+    (function($){
+      $(function(){
+        var $track = $('.track');
+        var $sections = $('.section');
+        var total = $sections.length;
+        var current = 0;
+        var animating = false;
+        var animDuration = 700; // ms - CSS と合わせる
+        var touchStartY = null;
+        var touchEndY = null;
+        var wheelTimeout;
+
+        // ページネーション（ドット）を作る
+        var $pager = $('.pager');
+        for (var i=0;i<total;i++){
+          var $dot = $('<div class="dot" role="button" tabindex="0" aria-label="セクション '+(i+1)+'"></div>');
+          (function(index){
+            $dot.on('click keypress', function(e){
+              if(e.type === 'keypress' && e.key !== 'Enter') return;
+              goTo(index);
+            });
+          })(i);
+          $pager.append($dot);
+        }
+
+        function updatePager(){
+          $pager.find('.dot').removeClass('active').eq(current).addClass('active');
+        }
+
+        updatePager();
+
+        // 移動（ループ）
+        function goTo(index){
+          if (animating) return;
+          animating = true;
+          $('body').addClass('animating');
+
+          // normalize index to loop
+          var next = ((index % total) + total) % total;
+          current = next;
+
+          var y = - current * 100;
+          $track.css('transform', 'translateY(' + y + 'vh)');
+
+          updatePager();
+          clearTimeout(wheelTimeout);
+          wheelTimeout = setTimeout(function(){
+            animating = false;
+            $('body').removeClass('animating');
+          }, animDuration + 50);
+        }
+
+        function next(){
+          goTo(current + 1);
+        }
+        function prev(){
+          goTo(current - 1);
+        }
+
+        // ホイール（マウス）
+        $(window).on('wheel', function(e){
+          // e.originalEvent.deltaY positive -> down
+          e.preventDefault();
+          if (animating) return;
+          var dy = e.originalEvent.deltaY;
+          if (dy > 0) next();
+          else if (dy < 0) prev();
+        });
+
+        // タッチ（スマホ）：簡易スワイプ判定
+        $(window).on('touchstart', function(e){
+          var t = e.originalEvent.touches[0];
+          touchStartY = t.clientY;
+        });
+        $(window).on('touchmove', function(e){
+          // 防止しないとページ全体がスクロールする
+          e.preventDefault();
+          var t = e.originalEvent.touches[0];
+          touchEndY = t.clientY;
+        });
+        $(window).on('touchend', function(e){
+          if (touchStartY === null || touchEndY === null) { touchStartY = touchEndY = null; return; }
+          var diff = touchStartY - touchEndY;
+          if (Math.abs(diff) > 30) {
+            if (diff > 0) next();
+            else prev();
+          }
+          touchStartY = touchEndY = null;
+        });
+
+        // キーボード操作
+        $(window).on('keydown', function(e){
+          if (animating) return;
+          if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); next(); }
+          if (e.key === 'ArrowUp' || e.key === 'PageUp')   { e.preventDefault(); prev(); }
+          if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+          if (e.key === 'End')  { e.preventDefault(); goTo(total-1); }
+        });
+
+        // マウスホイールが敏感すぎる時に速すぎる発火を抑える（ブラウザ依存）
+        // ここでは簡素にアニメーション中は受け付けない仕様で調整済み。
+
+        // 初期表示を整える（重要： track の高さをセクションの合計に合わせないといけないが、
+        // CSS 側で各セクションが 100vh なので transform だけでOK）
+        goTo(0);
+
+        // ウィンドウリサイズで vh の変化に対応（もし必要なら transform を再適用）
+        $(window).on('resize', function(){
+          // 再描写のため transform を再設定
+          $track.css('transform', 'translateY(' + (-current * 100) + 'vh)');
+        });
+      });
+    })(jQuery);
+  </script>
+</body>
+</html>
