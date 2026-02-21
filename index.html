@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PFsite page1(Top)</title>
+    
+    <link href="./CSS/reset.css" rel="stylesheet">
+	<link href="./css/stayle.css" rel="stylesheet">	
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+</head>
+
+<body>
+       <header>
+        <div class="wrap">
+			<h1>
+				<a href="index.html">
+					<img src="./images/mainlogo.png" alt="PORTFOLIO">
+				</a>
+			</h1>
+			<nav>
+				<ul class="menu">
+					<li>
+					<a href="index.html">ABOUT</a>
+					</li>
+					<li>
+					<a href="index.html#s2">GALLELY</a>
+                        <ul class="sub">
+                            <li class="2D"><a href="index2.html">2D</a></li>
+                            <li class="3D"><a href="index3.html">3D</a></li>
+                            <li class="MANAGEMENT"><a href="index4.html">MANAGEMENT</a></li>
+                        </ul>
+					</li>
+					<li>
+					<a href="index.html#3s">CONTACT</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+    </header>
+    
+    
+    <div class="sections" aria-hidden="false">
+    <div class="track">
+            <section class="section s1" data-index="0">                
+                <div id="s1">
+                    <div class="wrap">
+                        <div class="title">ABOUT ME</div>
+                            <p class="info">
+                                生年月日：2001/07/04<br>
+                                出身地：兵庫県加東市<br>
+                                出身校：専門学校 大阪デザイナー・アカデミー<br>
+                            </p>
+                            <p class="text">
+                            兵庫県加東市生まれ。３歳で神戸市東灘区に移住<br>
+                            高校在学中に友人に誘われて美術館巡りにハマり同時にポスターへ強い興味を抱く<br>
+                            大学卒業後興味があったグラフィックデザイナーを目指すため<br>
+                            大阪デザイナー・アカデミーへ<br>
+                            </p>
+                    </div>
+                </div>
+        </section>
+        <section class="section s2" data-index="1">                 
+            <div id="s2">
+                <div class="wrap">
+                    <div class="title">GALLELY</div>
+                        <ul class="info">
+                            <li>
+                                <a href="index2.html">2D<br>
+                                    <img src="images/2D_logo.png" alt="logo">
+                                </a>
+                            </li>
+                            <li>
+                                <a href="index3.html">3D<br>
+                                <img src="images/3D_logo.png" alt="logo">
+                                </a>
+                            </li>
+                            <li>
+                                <a href="index4.html">MANAGEMENT<br>
+                                    <img src="images/manage_logo.png" alt="logo">
+                                </a>
+                            </li>
+                        </ul>
+                </div>
+            </div>
+        </section>
+        <section class="section s3" data-index="2">                 
+            <div id="3s">
+                <div class="wrap">
+                    <div class="title">CONTACT</div>
+                    <section>
+                        <div class="inner">
+                                <h2 class="heading">お問い合わせはこちら</h2>
+                                <p><span class="red">※</span>は必須項目です。</p>
+                                <form  id="contact-form">
+                                        <input type="hidden" name="token" value="<?=$token?>">
+                                        <label class="form-label">お名前<span class="red">※</span></label>
+                                        <input type="text" name="name" value="" placeholder="お名前" required>
+                                        <label class="form-label">メールアドレス<span class="red">※</span></label>
+                                        <input type="email" name="email" value="" placeholder="メールアドレス" pattern="[\w\d_-]+@[\w\d_-]+\.[\w\d._-]+"　title="メールアドレスは、aaa@example.com のような形式で記入してください。"　 required>
+                                        <label class="form-label">お問い合わせ内容<span class="red">※</span></label>
+                                        <textarea name="message" cols="40" rows="10" placeholder="お問い合わせ内容" required></textarea>
+                                        <input type="submit" value="送信" class="send-btn" id="submit">
+                                </form>
+                                <p class="contact-result"></p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </div>
+  </div>
+
+  <!-- ページネーション -->
+  <div class="pager" aria-hidden="false"></div>
+
+  <div class="hint">スクロール / スワイプ / ↑ ↓ / ドットで移動</div>
+
+  <script>
+    (function($){
+      $(function(){
+        var $track = $('.track');
+        var $sections = $('.section');
+        var total = $sections.length;
+        var current = 0;
+        var animating = false;
+        var animDuration = 700; // ms - CSS と合わせる
+        var touchStartY = null;
+        var touchEndY = null;
+        var wheelTimeout;
+
+        // ページネーション（ドット）を作る
+        var $pager = $('.pager');
+        for (var i=0;i<total;i++){
+          var $dot = $('<div class="dot" role="button" tabindex="0" aria-label="セクション '+(i+1)+'"></div>');
+          (function(index){
+            $dot.on('click keypress', function(e){
+              if(e.type === 'keypress' && e.key !== 'Enter') return;
+              goTo(index);
+            });
+          })(i);
+          $pager.append($dot);
+        }
+
+        function updatePager(){
+          $pager.find('.dot').removeClass('active').eq(current).addClass('active');
+        }
+
+        updatePager();
+
+        // 移動（ループ）
+        function goTo(index){
+          if (animating) return;
+          animating = true;
+          $('body').addClass('animating');
+
+          // normalize index to loop
+          var next = ((index % total) + total) % total;
+          current = next;
+
+          var y = - current * 100;
+          $track.css('transform', 'translateY(' + y + 'vh)');
+
+          updatePager();
+          clearTimeout(wheelTimeout);
+          wheelTimeout = setTimeout(function(){
+            animating = false;
+            $('body').removeClass('animating');
+          }, animDuration + 50);
+        }
+
+        function next(){
+          goTo(current + 1);
+        }
+        function prev(){
+          goTo(current - 1);
+        }
+
+        // ホイール（マウス）
+        $(window).on('wheel', function(e){
+          // e.originalEvent.deltaY positive -> down
+          e.preventDefault();
+          if (animating) return;
+          var dy = e.originalEvent.deltaY;
+          if (dy > 0) next();
+          else if (dy < 0) prev();
+        });
+
+        // タッチ（スマホ）：簡易スワイプ判定
+        $(window).on('touchstart', function(e){
+          var t = e.originalEvent.touches[0];
+          touchStartY = t.clientY;
+        });
+        $(window).on('touchmove', function(e){
+          // 防止しないとページ全体がスクロールする
+          e.preventDefault();
+          var t = e.originalEvent.touches[0];
+          touchEndY = t.clientY;
+        });
+        $(window).on('touchend', function(e){
+          if (touchStartY === null || touchEndY === null) { touchStartY = touchEndY = null; return; }
+          var diff = touchStartY - touchEndY;
+          if (Math.abs(diff) > 30) {
+            if (diff > 0) next();
+            else prev();
+          }
+          touchStartY = touchEndY = null;
+        });
+
+        // キーボード操作
+        $(window).on('keydown', function(e){
+          if (animating) return;
+          if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); next(); }
+          if (e.key === 'ArrowUp' || e.key === 'PageUp')   { e.preventDefault(); prev(); }
+          if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+          if (e.key === 'End')  { e.preventDefault(); goTo(total-1); }
+        });
+
+        // マウスホイールが敏感すぎる時に速すぎる発火を抑える（ブラウザ依存）
+        // ここでは簡素にアニメーション中は受け付けない仕様で調整済み。
+
+        // 初期表示を整える（重要： track の高さをセクションの合計に合わせないといけないが、
+        // CSS 側で各セクションが 100vh なので transform だけでOK）
+        goTo(0);
+
+        // ウィンドウリサイズで vh の変化に対応（もし必要なら transform を再適用）
+        $(window).on('resize', function(){
+          // 再描写のため transform を再設定
+          $track.css('transform', 'translateY(' + (-current * 100) + 'vh)');
+        });
+      });
+    })(jQuery);
+  </script>
+    
+ 
+</body>
+</html>
